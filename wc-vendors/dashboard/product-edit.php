@@ -38,6 +38,17 @@ $post_status				= ( isset($product) && null !== $product ) ? $post->post_status 
 	<div class="all-100">
         <div class="wcv-cols-group wcv-horizontal-gutters">
             <div class="all-50 small-100">
+                <!-- Media uploader -->
+                <?php do_action( 'wcv_before_product_media', $object_id ); ?>
+                <div class="wcv-product-media">
+                    <?php do_action( 'wcv_before_media', $object_id ); ?>
+                        <?php WCVendors_Pro_Form_helper::product_media_uploader( $object_id ); ?>
+                    <?php do_action( 'wcv_after_media', $object_id ); ?>
+                </div>
+                <?php do_action( 'wcv_after_product_media', $object_id ); ?>
+            </div>
+            
+            <div class="all-50 small-100">
                 <!-- Basic Product Details -->
                 <div class="wcv-product-basic wcv-product">
                     <?php do_action( 'wcv_before_product_details', $object_id ); ?>
@@ -49,17 +60,6 @@ $post_status				= ( isset($product) && null !== $product ) ? $post->post_status 
                     
                     <?php do_action( 'wcv_after_product_details', $object_id ); ?>
                 </div>
-            </div>
-            
-            <div class="all-50 small-100">
-                <!-- Media uploader -->
-                <?php do_action( 'wcv_before_product_media', $object_id ); ?>
-                <div class="wcv-product-media">
-                    <?php do_action( 'wcv_before_media', $object_id ); ?>
-                        <?php WCVendors_Pro_Form_helper::product_media_uploader( $object_id ); ?>
-                    <?php do_action( 'wcv_after_media', $object_id ); ?>
-                </div>
-                <?php do_action( 'wcv_after_product_media', $object_id ); ?>
             </div>
         </div>
     </div>

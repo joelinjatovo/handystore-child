@@ -82,7 +82,63 @@ $social_icons = empty( $twitter_username ) && empty( $instagram_username ) && em
 
 <?php do_action( 'wcv_before_vendor_store_header' ); ?>
 
-<div class="header-container col-xs-12">
+<div class="header-container col-xs-12 hidden-desktop" style="margin-bottom: 10px;">
+    <div id="po-inner-element" class="">
+        <?php if ($store_icon != '') { ?>
+            <div class="po-store-icon">
+                <?php echo $store_icon; ?>
+            </div>
+        <?php } ?>
+        <div class="po-store-desc">
+            <?php do_action( 'wcv_before_vendor_store_title' ); ?>
+                <h3><?php if ( is_product() ) {
+                    echo '<a href="'. WCV_Vendors::get_vendor_shop_page( $post->post_author ).'">'. esc_attr($store_name) . '</a>';
+                } else { echo esc_attr($store_name); } ?></h3>
+                <?php if ( $verified_vendor ) : ?>
+                    <div class="wcv-verified-vendor">
+                        <i class="fa fa-check-circle-o fa-lg" aria-hidden="true"></i> &nbsp; <?php echo $verified_vendor_label; ?>
+                    </div>
+                <?php endif; ?>
+            <?php do_action( 'wcv_after_vendor_store_title' ); ?>
+
+            <?php do_action( 'wcv_before_vendor_store_rating' ); ?>
+            <div class="rating-container">
+              <?php if ( ! WCVendors_Pro::get_option( 'ratings_management_cap' ) ) echo WCVendors_Pro_Ratings_Controller::ratings_link( $vendor_id, true ); ?>
+            </div>
+            <?php do_action( 'wcv_after_vendor_store_rating' ); ?>
+        </div>
+    </div>
+    <div class="po-store-content">
+        <?php if ( ($address_label != '') || ($phone != '') ) { ?>
+            <?php if ( $address_label != '' ) {  ?><a target="_blank" href="http://maps.google.com/maps?&q=<?php echo $address; ?>"><i class="fa fa-map-marker" aria-hidden="true"></i> <?php echo $address_label; ?></a><br><?php } ?>
+            <?php if ($phone != '')  { ?><a href="tel:<?php echo $phone; ?>"><i class="fa fa-phone"></i> <?php echo $phone; ?></a><?php } ?>
+        <?php } ?>
+        
+        <?php if ( $social_icons ) echo $social_icons_list; ?>
+    </div>
+    
+    <?php if($store_description): ?>
+    <div class="po-store-content">
+        <?php do_action( 'wcv_before_vendor_store_description' ); ?>
+        <div class="po-entry-excerpt">
+            <?php echo $store_description; ?>
+        </div>
+        <?php do_action( 'wcv_after_vendor_store_description' ); ?>
+    </div>
+    <?php endif; ?>
+    
+    <div class="po-store-content po-store-content-last">
+        <div class="vendor-buttons">
+            <?php if ( function_exists('pt_output_favourite_button') ) pt_output_favourite_button($vendor_id); ?>
+            
+            <a class="button po-message-seller" id="po-message-seller" href="#" rel="nofollow">
+                <i class="fa fa-envelope-o" aria-hidden="true"></i> Contacter le vendeur
+            </a>
+        </div>
+    </div>
+</div>
+
+<div class="header-container col-xs-12 hidden-mobile">
 	<?php if( is_array( $store_banner_src ) ) {
         echo '<div id="banner-wrap" style="background: url('.esc_url($store_banner_src[0]).') repeat left top transparent;">';
     } else {
@@ -150,13 +206,9 @@ $social_icons = empty( $twitter_username ) && empty( $instagram_username ) && em
                     <?php $user_info = get_userdata( $vendor_id );
                         //echo '<span>'. $user_info->first_name .'&nbsp;'. $user_info->last_name .'</span>';
                         echo '<div class="vendor-message-seller-container">';
-                          echo '<a class="button" id="po-message-seller" href="#" rel="nofollow" title="Contacter le vendeur">';
+                          echo '<a class="button po-message-seller" id="po-message-seller" href="#" rel="nofollow" title="Contacter le vendeur">';
                                 echo '<i class="fa fa-envelope-o" aria-hidden="true"></i>Contacter le vendeur';
                             echo '</a>';
-                        echo '</div>';
-
-                        echo '<div id="po-vendor-message-seller" class="po-vendor-message-seller-form">';
-                            echo do_shortcode('[fep_shortcode_new_message_form to="{current-post-author}" subject="{current-post-title}"]');
                         echo '</div>';
                         /*
                         if (function_exists('pt_message_sender_form')) {
@@ -171,6 +223,13 @@ $social_icons = empty( $twitter_username ) && empty( $instagram_username ) && em
         </div>
     <?php echo '</div>'; ?>
 </div>
+<?php
+    if ( $message_sender_form === 'yes' ) {
+        echo '<div id="po-vendor-message-seller" class="po-vendor-message-seller-form">';
+            echo do_shortcode('[fep_shortcode_new_message_form to="{current-post-author}" subject="{current-post-title}"]');
+        echo '</div>';
+    }
+?>
 <?php do_action( 'wcv_after_vendor_store_header' ); ?>
 <script type="text/javascript">
 jQuery(document).ready(function ($) {
@@ -185,7 +244,7 @@ jQuery(document).ready(function ($) {
     });
 
     // Show the login/signup popup on click
-    $('#po-message-seller').on('click', function (e) {
+    $('.po-message-seller').on('click', function (e) {
         var overlay = '<div class="messenger_overlay"></div>';
         $('body').prepend($(overlay).css('opacity', '0.5'));
         $('#po-vendor-message-seller').fadeIn(300);

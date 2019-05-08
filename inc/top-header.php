@@ -35,6 +35,8 @@ class PO_TopMenuUser extends \WP_Widget {
 	}
 
 	public function widget($args, $instance) {
+        global $wpdb;
+        
 		extract($args);
 
 		$title = apply_filters('widget_title', $instance['title'] );
@@ -55,6 +57,30 @@ class PO_TopMenuUser extends \WP_Widget {
             if ( is_array( $store_icon_src ) ) {
                 $store_icon 	= '<img src="'.esc_url($store_icon_src[0]).'" alt="'.esc_attr($shop_name).'" class="store-icon" />';
             }
+            
+            $message_count = 0;
+            if ( function_exists('fep_query_url') ) :
+                $result = $wpdb->get_row($wpdb->prepare("SELECT count(id) as count FROM ".FEP_MESSAGES_TABLE." WHERE (to_user = %d AND parent_id = 0 AND to_del = 0 AND status = 0 AND last_sender <> %d) OR (from_user = %d AND parent_id = 0 AND from_del = 0 AND status = 0 AND last_sender <> %d)", $vendor_id, $vendor_id, $vendor_id, $vendor_id));
+                $message_count = (int) $result->count;
+            endif;
+
+            $wish_count = 0;
+            if (defined( 'YITH_WCWL' )){
+                $result = $wpdb->get_row($wpdb->prepare("SELECT count(ID) as count FROM {$wpdb->prefix}yith_wcwl WHERE user_id = %d ;", $vendor_id));
+                $wish_count = (int) $result->count;
+            }
+
+            $product_count = 0;
+            $results = array();
+            $args = array(
+                'posts_per_page'   => -1,
+                'post_type'        => 'product',
+                'author'	       => $vendor_id,
+                'post_status'      => 'publish',
+                'suppress_filters' => true 
+            );
+            $results = get_posts( $args );
+            $product_count = count($results);
             
             ?>
             <div id="top-header">
@@ -90,20 +116,28 @@ class PO_TopMenuUser extends \WP_Widget {
                         </a>
                         <div class="dropdown-content">
                             <?php if( class_exists('WCV_Vendors') && \WCV_Vendors::is_vendor( $vendor_id )){ ?>
-                                <a class="link" href="<?php echo site_url('dashboard/product/edit'); ?>"> <?php echo __( 'Ajouter un article', 'plumtree' ); ?></a>
+                                <a class="link" href="<?php echo site_url('dashboard/product/edit'); ?>"><i class="fa fa-pencil" aria-hidden="true"></i> <?php echo __( 'Ajouter un article', 'plumtree' ); ?></a>
                                 <?php if ( class_exists('WooCommerce') ) : ?>
-                                    <a class="link" href="<?php echo get_permalink( get_option('woocommerce_myaccount_page_id') ); ?>" title="<?php _e('Mon Profil', 'plumtree'); ?>"><?php _e('Mon Profil', 'plumtree'); ?></a>
+                                    <a class="link" href="<?php echo get_permalink( get_option('woocommerce_myaccount_page_id') ); ?>" title="<?php _e('Mon Profil', 'plumtree'); ?>"><i class="fa fa-user-o" aria-hidden="true"></i> <?php _e('Mon Profil', 'plumtree'); ?></a>
                                 <?php endif; ?>
-                                <a class="link" href="<?php echo site_url('dashboard/settings'); ?>"><?php _e('Mes Paramètres', 'plumtree'); ?></a>
-                                <a class="link" href="<?php echo WCV_Vendors::get_vendor_shop_page($vendor_id); ?>"><?php _e('Voir ma boutique', 'plumtree'); ?></a>
-                                <a class="link" href="<?php echo site_url('dashboard/product'); ?>"><?php _e('Mes articles', 'plumtree'); ?></a>
+                                <a class="link" href="<?php echo site_url('dashboard/settings'); ?>"><i class="fa fa-cogs" aria-hidden="true"></i> <?php _e('Mes Paramètres', 'plumtree'); ?></a>
+                                <a class="link" href="<?php echo WCV_Vendors::get_vendor_shop_page($vendor_id); ?>"><i class="fa fa-gift" aria-hidden="true"></i> <?php _e('Voir ma boutique', 'plumtree'); ?></a>
+                                <a class="link" href="<?php echo site_url('dashboard/product'); ?>"><i class="fa fa-gift" aria-hidden="true"></i> <?php _e('Mes articles', 'plumtree'); ?> (<?php echo $product_count; ?>)</a>
                             <?php } ?>
-                            <a class="link" href="<?php echo site_url('wishlist'); ?>"><?php _e('Mes favoris', 'plumtree'); ?></a>
-                            <a class="link" href="<?php echo site_url('comment-ca-marche'); ?>"><?php _e('Comment ça marche ?', 'plumtree'); ?></a>
-                            <a class="link" href="<?php echo wp_logout_url( apply_filters( 'the_permalink', get_permalink( ) ) ); ?>" title="<?php _e('Log out of this account', 'handy-feature-pack');?>" style="color: #F03E53;"><?php _e('Log out', 'handy-feature-pack');?></a>
+                            <a class="link" href="<?php echo site_url('wishlist'); ?>"><i class="fa fa-heart-o" aria-hidden="true"></i> <?php _e('Mes favoris', 'plumtree'); ?> (<?php echo $wish_count; ?>)</a>
+                            <a class="link" href="<?php echo site_url('comment-ca-marche'); ?>"><i class="fa fa-question-circle-o" aria-hidden="true"></i> <?php _e('Comment ça marche ?', 'plumtree'); ?></a>
+                            <a class="link" href="<?php echo wp_logout_url( apply_filters( 'the_permalink', get_permalink( ) ) ); ?>" title="<?php _e('Log out of this account', 'handy-feature-pack');?>" style="color: #F03E53;"><i class="fa fa-sign-out" aria-hidden="true"></i> <?php _e('Log out', 'handy-feature-pack');?></a>
                         </div>
                     </li>
                 </ul>
+<script type="text/javascript">
+jQuery(document).ready(function ($) {
+    "use strict";
+    $('li.dropdown').on('click', function (e) {
+        $(this).find('.dropdown-content').toggleClass('open');
+    });
+});
+</script>
         <?php } else { ?>
 			<form id="login" class="ajax-auth" method="post">
 				<h3><?php _e('New to site? ', 'handy-feature-pack');?><a id="pop_signup" href=""><?php _e('Create an Account', 'handy-feature-pack');?></a></h3>

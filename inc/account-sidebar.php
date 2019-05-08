@@ -90,7 +90,7 @@ class PO_DashboardVendor extends WP_Widget {
                 if( class_exists('WCV_Vendors') && \WCV_Vendors::is_vendor( $vendor_id )){
                     echo '<li class="nav-item"><a class="button1" href="'.site_url('dashboard/product/edit').'"><i class="fa fa-plus" aria-hidden="true"></i> '.__( 'Ajouter un article', 'plumtree' ).'</a></li>';
                     if (class_exists('WooCommerce') ) :
-                        echo '<li class="nav-item"><a class="button2" href="'.get_permalink(get_option('woocommerce_myaccount_page_id')).'"><i class="fa fa-user" aria-hidden="true"></i> '.__('Mon profil','plumtree').'</a></li>';
+                        echo '<li class="nav-item"><a class="button2" href="'.get_permalink(get_option('woocommerce_myaccount_page_id')).'"><i class="fa fa-user-o" aria-hidden="true"></i> '.__('Mon profil','plumtree').'</a></li>';
                     endif;
                     echo '<li class="nav-item"><a class="button4" href="'.$shop_url.'"><i class="fa fa-gift" aria-hidden="true"></i> '.__( 'Voir ma boutique', 'plumtree' ).'</a></li>';
                     echo '<li class="nav-item"><a class="button4" href="'.site_url('dashboard/product').'"><i class="fa fa-gift" aria-hidden="true"></i> '.__( 'Mes articles', 'plumtree' ).' ('.$product_count.')</a></li>';
@@ -99,8 +99,8 @@ class PO_DashboardVendor extends WP_Widget {
                 if ( function_exists('fep_query_url') ) :
                     echo '<li class="nav-item"><a class="button4" href="'. fep_query_url( 'messagebox' ) .'"><i class="fa fa-envelope-o" aria-hidden="true"></i> ' . sprintf(__('Voir mes messages %s', 'plumtree'), fep_get_new_message_button() ) . '</a></li>';
                 endif;
-                echo '<li class="nav-item"><a class="button4" href="'.site_url('wishlist').'"><i class="fa fa-heart" aria-hidden="true"></i> '.__( 'Mes favoris', 'plumtree' ).' ('.$wish_count.')</a></li>';
-                echo '<li class="nav-item"><a class="button4" href="'.site_url('comment-ca-marche').'"><i class="fa fa-question-circle" aria-hidden="true"></i> '.__( 'Comment ça marche ?', 'plumtree' ).'</a></li>';
+                echo '<li class="nav-item"><a class="button4" href="'.site_url('wishlist').'"><i class="fa fa-heart-o" aria-hidden="true"></i> '.__( 'Mes favoris', 'plumtree' ).' ('.$wish_count.')</a></li>';
+                echo '<li class="nav-item"><a class="button4" href="'.site_url('comment-ca-marche').'"><i class="fa fa-question-circle-o" aria-hidden="true"></i> '.__( 'Comment ça marche ?', 'plumtree' ).'</a></li>';
                 echo '<li class="nav-item"><a class="logout button4" href="'.wp_logout_url(apply_filters('the_permalink', get_permalink())).'"><i class="fa fa-sign-out" aria-hidden="true"></i> '.__( 'Log out', 'handy-feature-pack' ).'</a></li>';
             echo '</ul>';
         }

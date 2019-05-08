@@ -31,6 +31,167 @@ function passion_user_last_login( $user_login, $user ) {
 }
 add_action('wp_login', 'passion_user_last_login', 10, 2 );
 
+function passion_vendor_box_shortcode_2($atts){
+    $defaults = [
+        'button'     => true,  
+        'email'      => 0,  
+        'phone'      => true,  
+        'last_visit' => true,  
+    ];
+    $atts = shortcode_atts($defaults, $atts, 'passion_vendor_box_2');
+    extract($atts);
+    
+    
+    if(class_exists('WCV_Vendors')){
+        global $post;
+        
+        ob_start();
+        echo '<div class="vendor-container">';
+            echo '<div>';
+                echo '<div class="passion_vendor_box" style="position: relative; padding-bottom: 90px; min-height: 135px;">';
+                $vendor_id = \WCV_Vendors::get_vendor_from_product($post->ID);
+                if(\WCV_Vendors::is_vendor( $vendor_id )){
+                    $store_icon_src = wp_get_attachment_image_src( get_user_meta( $vendor_id, '_wcv_store_icon_id', true ), 'pt-vendor-main-logo' );
+                    $store_icon     = '';
+                    $user_data      = get_userdata($vendor_id);
+                    $store_name     = get_user_meta( $vendor_id, 'pv_shop_name', true );
+                    $last_login     = get_user_meta($vendor_id, 'last_login', true);
+                    $phone_number   = get_user_meta($vendor_id, '_wcv_store_phone', true);
+                    $the_login_date = human_time_diff($last_login);
+
+                    // Get Vendor address
+                    $address1 	    = get_user_meta($vendor_id, '_wcv_store_address1', true );
+                    $city 			= get_user_meta($vendor_id, '_wcv_store_city', true );
+                    $state 			= get_user_meta($vendor_id, '_wcv_store_state', true );
+                    $store_postcode = get_user_meta($vendor_id, '_wcv_store_postcode', true );
+                    $address 		= ( $address1 != '') ? $address1 .', ' . $city .', '. $state .', '. $store_postcode : '';
+                    $address_labels = [];
+                    if($address1 != ''){
+                        $address_labels[] = $address1;
+                    }
+                    if($city != ''){
+                        $address_labels[] = $city;
+                    }
+                    if($state != ''){
+                        $address_labels[] = $state;
+                    }
+                    if($store_postcode != ''){
+                        $address_labels[] = $store_postcode;
+                    }
+                    $address_label = implode($address_labels, ', ');
+
+                    // Get Vendor socials
+                    $twitter_username 	= get_user_meta( $vendor_id , '_wcv_twitter_username', true );
+                    $instagram_username = get_user_meta( $vendor_id , '_wcv_instagram_username', true );
+                    $facebook_url 		= get_user_meta( $vendor_id , '_wcv_facebook_url', true );
+                    $linkedin_url       = get_user_meta( $vendor_id , '_wcv_linkedin_url', true );
+                    $youtube_url 	    = get_user_meta( $vendor_id , '_wcv_youtube_url', true );
+                    $googleplus_url	    = get_user_meta( $vendor_id , '_wcv_googleplus_url', true );
+                    $pinterest_url 	    = get_user_meta( $vendor_id , '_wcv_pinterest_url', true );
+
+                    // Social list
+                    $social_icons_list = '<ul class="social-icons" style="margin-bottom: 10px;text-align: center;">';
+                    if ( $facebook_url != '') { $social_icons_list .= '<li><a href="'.$facebook_url.'" target="_blank"><i class="fa fa-facebook"></i></a></li>'; }
+                    if ( $instagram_username != '') { $social_icons_list .= '<li><a href="//instagram.com/'.$instagram_username.'" target="_blank"><i class="fa fa-instagram"></i></a></li>'; }
+                    if ( $twitter_username != '') { $social_icons_list .= '<li><a href="//twitter.com/'.$twitter_username.'" target="_blank"><i class="fa fa-twitter"></i></a></li>'; }
+                    if ( $googleplus_url != '') { $social_icons_list .= '<li><a href="'.$googleplus_url.'" target="_blank"><i class="fa fa-google-plus"></i></a></li>'; }
+                    if ( $youtube_url != '') { $social_icons_list .= '<li><a href="'.$youtube_url.'" target="_blank"><i class="fa fa-youtube"></i></a></li>'; }
+                    if ( $linkedin_url != '') { $social_icons_list .= '<li><a href="'.$linkedin_url.'" target="_blank"><i class="fa fa-linkedin"></i></a></li>'; }
+                    $social_icons_list .= '</ul>';
+                    $social_icons = empty( $twitter_username ) && empty( $instagram_username ) && empty( $facebook_url ) && empty( $linkedin_url ) && empty( $youtube_url ) && empty( $googleplus_url ) && empty( $pinterst_url ) ? false : true;
+
+                    echo '<div class="passion_vendor-image">';
+                        // see if the array is valid
+                        if ( is_array( $store_icon_src ) ) {
+                            echo '<a href="'.WCV_Vendors::get_vendor_shop_page( $vendor_id ).'">';
+                                echo '<img src="'. esc_url($store_icon_src[0]) .'" alt="'. esc_attr($store_name) .'" class="store-icon" />';
+                            echo '</a>';
+                        }else{
+                            echo get_avatar($vendor_id);
+                        }
+                    echo '</div>';
+
+                }else{
+                    echo get_bloginfo( 'name' );
+                }
+
+                echo '<div class="vendor-message-seller-container">';
+                  if(\WCV_Vendors::is_vendor( $vendor_id )){
+                      echo '<div class="vendor-name">';
+                            printf('<a href="%s"><h3>%s</h3></a>', WCV_Vendors::get_vendor_shop_page( $vendor_id ), WCV_Vendors::get_vendor_sold_by( $vendor_id ) );
+                            do_action( 'wcv_before_vendor_store_rating' );
+                            echo '<div class="rating-container">';
+                            if ( !WCVendors_Pro::get_option( 'ratings_management_cap' )) echo WCVendors_Pro_Ratings_Controller::ratings_link( $vendor_id, true );
+                            echo '</div>';
+                            do_action( 'wcv_after_vendor_store_rating' );
+                            echo '<div class="vendor-desc">';
+                                if($last_visit==true){
+                                    printf(__('Dernière visite : %s', 'pulmtree'), $the_login_date);
+                                }
+
+                                if($address==true){
+                                    echo '<br><i class="fa fa-map-marker" aria-hidden="true"></i> '.$address_label;
+                                }
+
+                                if($email==true){
+                                    echo '<br><a href="mailto:'.$user_data->user_email.'"><i class="fa fa-envelope-o" aria-hidden="true"></i> '.$user_data->user_email.'</a>';
+                                }
+
+                                if(!empty($phone_number)){
+                                    echo '<br><a href="tel:'.$phone_number.'"><i class="fa fa-phone" aria-hidden="true"></i> '.$phone_number.'</a>';
+                                }
+                            echo '</div>';
+                      echo '</div>';
+                  }
+                echo '</div>';
+
+                echo '<div id="po-vendor-message-seller" class="po-vendor-message-seller-form">';
+                    echo do_shortcode('[fep_shortcode_new_message_form to="{current-post-author}" subject="{current-post-title}"]');
+                echo '</div>';
+                ?>
+
+                <script type="text/javascript">
+                jQuery(document).ready(function ($) {
+                    "use strict";
+
+                    // Close popup
+                    $(document).on('click', '.messenger_overlay, .close', function (e) {
+                            $('#po-vendor-message-seller').fadeOut(300);
+                            $('.messenger_overlay').css('opacity', '0');
+                            $('.messenger_overlay').remove();
+                            e.preventDefault();
+                    });
+
+                    // Show the login/signup popup on click
+                    $('#po-message-seller').on('click', function (e) {
+                        var overlay = '<div class="messenger_overlay"></div>';
+                        $('body').prepend($(overlay).css('opacity', '0.5'));
+                        $('#po-vendor-message-seller').fadeIn(300);
+                        e.preventDefault();
+                    });
+                });
+                </script>
+
+            <?php
+                echo '</div>'; // END .passion_vendor_box
+                echo '<div class="vendor-buttons">';
+                    echo '<a class="button" id="po-message-seller" href="#" rel="nofollow">';
+                        echo '<i class="fa fa-envelope-o" aria-hidden="true"></i>Contacter le vendeur';
+                    echo '</a>';
+                echo '</div>'; // END .vendor-buttons
+            echo '</div>';
+        echo '</div>'; // END .vendor-container
+        
+        $ret_str=ob_get_contents();
+        ob_end_clean();
+        
+        return $ret_str;
+    }
+    
+    return "";
+}
+add_shortcode('passion_vendor_box_2', 'passion_vendor_box_shortcode_2');
+
 function passion_vendor_box_shortcode($atts){
     $defaults = [
         'button'     => true,  
@@ -713,7 +874,7 @@ function passion_product_description(){
     echo '</div>';
     
     echo '<div class="entry-passion_vendor_box hidden-desktop">';
-        echo do_shortcode('[passion_vendor_box]');
+        echo do_shortcode('[passion_vendor_box_2]');
     echo '</div>';
 }
 add_action('woocommerce_single_product_summary', 'passion_product_description', 29);
@@ -758,6 +919,8 @@ function passion_set_as_sold() {
                 $text[ 'notice' ] = __( 'Ce produit ne vous appartient pas', 'pulmtree' );
                 $text[ 'type' ]   = 'error';    
             }else{
+                update_post_meta($post_id, '_manage_stock', 'no');
+                
                 $stock_status = isset($_POST['stock_status'])?$_POST['stock_status']:'outofstock';
                 wc_update_product_stock_status($post_id, $stock_status);
                 if($stock_status=='outofstock'){
@@ -780,40 +943,34 @@ function passion_set_as_sold() {
 }
 add_action('template_redirect', 'passion_set_as_sold' );
 
-function passion_rewrites_init(){
-    add_rewrite_rule(
-        'product-sold/([0-9]+)/?$',
-        'index.php?pagename=product-sold&product_sold_id=$matches[1]',
-        'top' );
+function passion_rewrite_rules_array($rules){
+    $newrules = array();
+    $newrules['product-sold/([0-9]+)/?$'] = 'index.php?pagename=product-sold&product_sold_id=$matches[1]';
+    return $newrules + $rules;
 }
-add_action('init', 'passion_rewrites_init' );
+add_action('rewrite_rules_array', 'passion_rewrite_rules_array' );
 
 // do not use on live/production servers
-function passion_rewrite_rules() {
-	$ver = filemtime( __FILE__ ); // Get the file time for this file as the version number
-	$defaults = array( 'version' => 0, 'time' => time() );
-	$r = wp_parse_args( get_option( __CLASS__ . '_flush', array() ), $defaults );
-
-	if ( $r['version'] != $ver || $r['time'] + 172800 < time() ) { // Flush if ver changes or if 48hrs has passed.
-		flush_rewrite_rules();
-		// trace( 'flushed' );
-		$args = array( 'version' => $ver, 'time' => time() );
-		if ( ! update_option( __CLASS__ . '_flush', $args ) )
-			add_option( __CLASS__ . '_flush', $args );
-	}
+function passion_wp_loaded_2() {							
+    $rules = get_option( 'rewrite_rules' );			
+    if (!isset($rules['product-sold/([0-9]+)/?$'])){
+        global $wp_rewrite;
+        $wp_rewrite->flush_rules();
+    }
 }
-add_action( 'init', 'passion_rewrite_rules' );
+add_action( 'wp_loaded', 'passion_wp_loaded_2' );
 
 function passion_query_vars( $query_vars ){
-    $query_vars[] = 'product_sold_id';
+    array_push($query_vars, 'product_sold_id');
     return $query_vars;
 }
 add_filter('query_vars', 'passion_query_vars' );
 
 
 function passion_product_store_sold(){
+    global $post;
     global $product;
-    if ( !$product->is_in_stock() ) {
+    if (!$product->is_in_stock() ) {
         echo '<p class="stock sold">Vendu</p>';
     }
 }
@@ -853,3 +1010,14 @@ add_filter('wcvendors_pro_table_product_search_meta_keys', function($meta_search
     }
     return $meta_search;
 }, 10, 1);
+
+/**
+ * Change a currency symbol
+ */
+add_filter('woocommerce_currency_symbol', 'passion_change_existing_currency_symbol', 10, 2);
+function passion_change_existing_currency_symbol( $currency_symbol, $currency ) {
+     switch( $currency ) {
+          case 'TND': $currency_symbol = 'DT'; break;
+     }
+     return $currency_symbol;
+}

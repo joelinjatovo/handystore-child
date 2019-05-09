@@ -173,7 +173,7 @@ function passion_vendor_box_shortcode_2($atts){
                   }
                 echo '</div>';
 
-                echo '<div id="po-vendor-message-seller" class="po-vendor-message-seller-form">';
+                echo '<div id="po-vendor-message-seller-2" class="po-vendor-message-seller-form">';
                     echo do_shortcode('[fep_shortcode_new_message_form to="{current-post-author}" subject="{current-post-title}"]');
                 echo '</div>';
                 ?>
@@ -184,17 +184,17 @@ function passion_vendor_box_shortcode_2($atts){
 
                     // Close popup
                     $(document).on('click', '.messenger_overlay, .close', function (e) {
-                            $('#po-vendor-message-seller').fadeOut(300);
+                            $('#po-vendor-message-seller-2').fadeOut(300);
                             $('.messenger_overlay').css('opacity', '0');
                             $('.messenger_overlay').remove();
                             e.preventDefault();
                     });
 
                     // Show the login/signup popup on click
-                    $('#po-message-seller').on('click', function (e) {
+                    $('#po-message-seller-2').on('click', function (e) {
                         var overlay = '<div class="messenger_overlay"></div>';
                         $('body').prepend($(overlay).css('opacity', '0.5'));
-                        $('#po-vendor-message-seller').fadeIn(300);
+                        $('#po-vendor-message-seller-2').fadeIn(300);
                         e.preventDefault();
                     });
                 });
@@ -203,7 +203,7 @@ function passion_vendor_box_shortcode_2($atts){
             <?php
                 echo '</div>'; // END .passion_vendor_box
                 echo '<div class="vendor-buttons">';
-                    echo '<a class="button" id="po-message-seller" href="#" rel="nofollow">';
+                    echo '<a class="button" id="po-message-seller-2" href="#" rel="nofollow">';
                         echo '<i class="fa fa-envelope-o" aria-hidden="true"></i>Contacter le vendeur';
                     echo '</a>';
                 echo '</div>'; // END .vendor-buttons
@@ -884,6 +884,11 @@ function passion_product_media_uploader( $post_id ) {
 add_action( 'wp_ajax_handle_dropped_media', 'po_handle_dropped_media' );
 function po_handle_dropped_media() {
     status_header(200);
+    
+    // These files need to be included as dependencies when on the front end.
+	require_once( ABSPATH . 'wp-admin/includes/image.php' );
+	require_once( ABSPATH . 'wp-admin/includes/file.php' );
+	require_once( ABSPATH . 'wp-admin/includes/media.php' );
 
     $upload_dir = wp_upload_dir();
     $upload_path = $upload_dir['path'] . DIRECTORY_SEPARATOR;

@@ -29,13 +29,12 @@ jQuery(document).ready(function($){
             var data = JSON.parse(response);
             
             if(data.status==1){
-                var ID = data.attachment_id;
                 
                 jQuery('.wcv_gallery_msg').text('');
                 file.previewElement.classList.add("dz-success");
-                file['attachment_id'] = ID; // push the id for future reference
+                file['attachment_id'] = data.attachment_id; // push the id for future reference
 
-                jQuery('ul.product_images').append('<li class="wcv-gallery-image" data-attachment_id="'+ID+'"><img width="150" height="150" src="'+file.dataURL+'" class="attachment-150x150 size-150x150" alt=""><ul class="actions"><li><a href="#" class="po_delete" title="delete"><i class="fa fa-times"></i></a></li></ul></li>');
+                jQuery('ul.product_images').append('<li class="wcv-gallery-image" data-attachment_id="'+data.attachment_id+'"><img width="150" height="150" src="'+file.dataURL+'" class="attachment-150x150 size-150x150" alt=""><ul class="actions"><li><a href="#" class="po_delete" title="delete"><i class="fa fa-times"></i></a></li></ul></li>');
 
                 var $featured_image_id = jQuery('#_featured_image_id');
                 var $image_gallery_ids = jQuery('#product_image_gallery');
@@ -57,6 +56,7 @@ jQuery(document).ready(function($){
             }else{
                 file.previewElement.classList.add("dz-error");
                 jQuery('.wcv_gallery_msg').text(data.message);
+                poDropzone.options.maxFiles = poDropzone.options.maxFiles + 1;
             }
         },
         error: function (file, response) {

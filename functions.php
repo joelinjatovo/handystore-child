@@ -911,6 +911,7 @@ function po_handle_dropped_media() {
             
             foreach($_FILES as $file => $array) {
                 $newupload = media_handle_upload($file, 0);
+                //$newupload = media_handle_upload($file, 0, [], ['test_type'=>0, 'test_form' => false]);
             }
         }
     }
@@ -941,3 +942,43 @@ function po_handle_deleted_media(){
     }
     die();
 }
+
+function po_wp_handle_upload($data, $action){
+    ob_start();
+    print_r($data);
+    echo $action;
+    $c = ob_get_clean();
+    file_put_contents(ABSPATH . 'bbb.log', $c);
+    return $data;
+}
+add_filter('wp_handle_upload', 'po_wp_handle_upload', 10, 2);
+
+function po_wp_check_filetype_and_ext($data, $file, $filename, $mimes, $real_mime){
+    if(empty($data['ext']) && empty($data['type'])){
+        if(strpos($filename, 'jpeg')!==false){
+            $data['ext'] = 'jpeg';
+            $data['type'] = 'image/jpeg';
+        }
+        if(strpos($filename, 'jpg')!==false){
+            $data['ext'] = 'jpg';
+            $data['type'] = 'image/jpg';
+        }
+        if(strpos($filename, 'png')!==false){
+            $data['ext'] = 'png';
+            $data['type'] = 'image/png';
+        }
+        if(strpos($filename, 'gif')!==false){
+            $data['ext'] = 'gif';
+            $data['type'] = 'image/gif';
+        }
+    }
+    
+    ob_start();
+    print_r($data);
+    echo $filename;
+    $c = ob_get_clean();
+    file_put_contents(ABSPATH . 'aaa.log', $c);
+    
+    return $data;
+}
+add_filter('wp_check_filetype_and_ext', 'po_wp_check_filetype_and_ext', PHP_MAX_INT, 5);

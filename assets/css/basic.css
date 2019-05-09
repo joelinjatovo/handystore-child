@@ -25,6 +25,9 @@ position: relative; }
     color: #b1d1c9;
     border-radius: 2px;
 }
+.dropzone .dz-preview.dz-image-preview {
+    background: transparent;
+}
 .dropzone .dz-preview {
 position: relative;
 display: inline-block;

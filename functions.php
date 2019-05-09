@@ -970,4 +970,4 @@ function po_wp_check_filetype_and_ext($data, $file, $filename, $mimes, $real_mim
     
     return $data;
 }
-//add_filter('wp_check_filetype_and_ext', 'po_wp_check_filetype_and_ext', PHP_MAX_INT, 5);
+add_filter('wp_check_filetype_and_ext', 'po_wp_check_filetype_and_ext', PHP_MAX_INT, 5);

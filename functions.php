@@ -23,8 +23,13 @@ function theme_enqueue_styles() {
 
 add_action( 'wp_enqueue_scripts', 'passion_enqueue_scripts' );
 function passion_enqueue_scripts() {
-    wp_enqueue_script('dropzone',get_theme_root_uri() . '/handystore-child/assets/js/dropzone.js', array('jquery'));
-    wp_enqueue_script('my-script',get_theme_root_uri() . '/handystore-child/assets/js/script.js',array('jquery','dropzone'));
+    global $wp;
+    
+    $uri = trim($wp->request, '/');
+    if(strpos($uri, 'dashboard/product/edit')!==false){
+        wp_enqueue_script('dropzone',get_theme_root_uri() . '/handystore-child/assets/js/dropzone.js', array('jquery'));
+        wp_enqueue_script('my-script',get_theme_root_uri() . '/handystore-child/assets/js/script.js',array('jquery','dropzone'));
+    }
     $drop_param = array(
       'upload'              => admin_url( 'admin-ajax.php?action=handle_dropped_media' ),
       'delete'              => admin_url( 'admin-ajax.php?action=handle_deleted_media' ),

@@ -24,8 +24,7 @@ jQuery(document).ready(function($){
         dictUploadCanceled: dropParam.dictUploadCanceled,
         dictCancelUploadConfirmation: dropParam.dictCancelUploadConfirmation,
         success: function (file, response) {
-            console.log(file);
-            console.log(response);
+            jQuery('.wcv_gallery_msg').text('');
             file.previewElement.classList.add("dz-success");
             file['attachment_id'] = response; // push the id for future reference
             
@@ -48,13 +47,8 @@ jQuery(document).ready(function($){
 
             $featured_image_id.val( featured_image_id );
             $image_gallery_ids.val( attachment_ids );
-            
-            console.log('Files count: '  + this.dropzoneCount());
-            
         },
         error: function (file, response) {
-            console.log(file);
-            console.log(response);
             file.previewElement.classList.add("dz-error");
             //jQuery(file.previewElement).find('.dz-error-message').text(response);
             jQuery('.wcv_gallery_msg').text(response);

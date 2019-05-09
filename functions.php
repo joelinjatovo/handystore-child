@@ -910,12 +910,22 @@ function po_handle_dropped_media() {
             $_FILES = array('upload'=>$newfile);
             
             foreach($_FILES as $file => $array) {
-                $newupload = media_handle_upload($file, 0 );
+                $newupload = media_handle_upload($file, 0);
             }
         }
     }
 
-    echo $newupload;    
+    if(is_wp_error($newupload)){
+        echo json_encode(array(
+            'status'  => 0,
+            'message' => esc_html( $newupload->get_error_message() ),
+        ));
+    }else{
+        echo json_encode(array(
+            'status'  => 1,
+            'attachment_id' => $newupload,
+        ));
+    } 
     die();
 }
 

@@ -28,7 +28,7 @@ jQuery(document).ready(function($){
             file.previewElement.classList.add("dz-success");
             file['attachment_id'] = response; // push the id for future reference
             
-            jQuery('ul.product_images').append('<li class="wcv-gallery-image" data-attachment_id="'+response+'"><img width="150" height="150" src="'+file.dataURL+'" class="attachment-150x150 size-150x150" alt=""><ul class="actions"><li><a href="#" class="po_delete" title="delete"><i class="wcv-icon wcv-icon-times"></i></a></li></ul></li>');
+            jQuery('ul.product_images').append('<li class="wcv-gallery-image" data-attachment_id="'+response+'"><img width="150" height="150" src="'+file.dataURL+'" class="attachment-150x150 size-150x150" alt=""><ul class="actions"><li><a href="#" class="po_delete" title="delete"><i class="fa fa-times"></i></a></li></ul></li>');
            
             var $featured_image_id = jQuery('#_featured_image_id');
             var $image_gallery_ids = jQuery('#product_image_gallery');

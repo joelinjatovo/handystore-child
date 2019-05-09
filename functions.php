@@ -851,7 +851,7 @@ function passion_product_media_uploader( $post_id ) {
                         echo '<li class="wcv-gallery-image" data-attachment_id="' . $attachment_id . '">';
                         echo wp_get_attachment_image($attachment_id, array(150,150) );
                         echo '<ul class="actions">';
-                        echo '<li><a href="#" class="po_delete" title="delete"><i class="wcv-icon wcv-icon-times"></i></a></li>';
+                        echo '<li><a href="#" class="po_delete" title="delete"><i class="fa fa-times"></i></a></li>';
                         echo '</ul>';
                         echo '</li>';
                     }
@@ -860,7 +860,7 @@ function passion_product_media_uploader( $post_id ) {
                             echo '<li class="wcv-gallery-image" data-attachment_id="' . $attachment_id . '">';
                             echo wp_get_attachment_image( $attachment_id, array(150,150) );
                             echo '<ul class="actions">';
-                            echo '<li><a href="#" class="po_delete" title="delete"><i class="wcv-icon wcv-icon-times"></i></a></li>';
+                            echo '<li><a href="#" class="po_delete" title="delete"><i class="fa fa-times"></i></a></li>';
                             echo '</ul>';
                             echo '</li>';
                         }

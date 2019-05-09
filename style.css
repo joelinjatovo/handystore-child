@@ -11,6 +11,9 @@ License URI: http://www.gnu.org/licenses/gpl-2.0.html
 Tags: one-column, two-columns, right-sidebar, custom-header, custom-menu, editor-style, featured-images, microformats, post-formats, sticky-post, translation-ready
 Text Domain: plumtree
 */
+.wcv-grid #product_images_container ul li ul.actions {
+    display: block !important;
+}
 ins{background: none !important;}
 .related, .upsells, .wcv-related {
     margin-top: 15px;

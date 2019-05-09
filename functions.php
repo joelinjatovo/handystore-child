@@ -191,7 +191,7 @@ function passion_vendor_box_shortcode_2($atts){
                     });
 
                     // Show the login/signup popup on click
-                    $('#po-message-seller-2').on('click', function (e) {
+                    $('.po-message-seller').on('click', function (e) {
                         var overlay = '<div class="messenger_overlay"></div>';
                         $('body').prepend($(overlay).css('opacity', '0.5'));
                         $('#po-vendor-message-seller-2').fadeIn(300);
@@ -203,7 +203,7 @@ function passion_vendor_box_shortcode_2($atts){
             <?php
                 echo '</div>'; // END .passion_vendor_box
                 echo '<div class="vendor-buttons">';
-                    echo '<a class="button" id="po-message-seller-2" href="#" rel="nofollow">';
+                    echo '<a class="button po-message-seller" id="po-message-seller" href="#" rel="nofollow">';
                         echo '<i class="fa fa-envelope-o" aria-hidden="true"></i>Contacter le vendeur';
                     echo '</a>';
                 echo '</div>'; // END .vendor-buttons

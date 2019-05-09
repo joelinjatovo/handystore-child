@@ -146,7 +146,6 @@ $post_status				= ( isset($product) && null !== $product ) ? $post->post_status 
         <?php do_action( 'wcv_after_attributes_tab', $object_id ); ?>
     </div>
     
-    <input type="hidden" name="_manage_stock" value="no"/>
     <input type="hidden" name="_virtual" value="no"/>
     <input type="hidden" name="_downloadable" value="no"/>
     

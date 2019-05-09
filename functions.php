@@ -26,8 +26,18 @@ function passion_enqueue_scripts() {
     wp_enqueue_script('dropzone',get_theme_root_uri() . '/handystore-child/assets/js/dropzone.js', array('jquery'));
     wp_enqueue_script('my-script',get_theme_root_uri() . '/handystore-child/assets/js/script.js',array('jquery','dropzone'));
     $drop_param = array(
-      'upload'=>admin_url( 'admin-ajax.php?action=handle_dropped_media' ),
-      'delete'=>admin_url( 'admin-ajax.php?action=handle_deleted_media' ),
+      'upload'              => admin_url( 'admin-ajax.php?action=handle_dropped_media' ),
+      'delete'              => admin_url( 'admin-ajax.php?action=handle_deleted_media' ),
+      'dictMaxFilesExceeded'  => __( 'Vous ne pouvez plus télécharger de fichiers.', 'pulmtree'),
+      'dictDefaultMessage'  => __( 'Add Images to Product Gallery', 'wcvendors-pro'),
+      'dictFileTooBig'  => __( 'Cette image est trop grande. Nous n\'autorisons que 2Mo ou moins.', 'pulmtree'),
+      'dictInvalidFileType' => __( 'Ce type de fichier est invalide', 'pulmtree'),
+      'dictRemoveFile'      => __( 'Supprimer', 'pulmtree'),
+      'dictRemoveFileConfirmation' => __( 'Voulez-vous vraiment supprimer le fichier?', 'pulmtree'),
+      'dictCancelUpload'    => __( 'Annuler', 'pulmtree'),
+      'dictUploadCanceled'  => __( 'Téléversement annulé', 'pulmtree'),
+      'dictCancelUploadConfirmation'  => __( 'Téléversement annulé', 'pulmtree'),
+      'dictCancelUploadConfirmation'  => __( "Voulez-vous vraiment annuler le Téléversement?", 'pulmtree'),
     );
     wp_localize_script('my-script','dropParam', $drop_param);
 }
@@ -791,30 +801,12 @@ function passion_product_media_uploader( $post_id ) {
 
         do_action( 'wcv_form_product_media_uploader_before_product_media_uploader', $post_id );
 
-        echo '<div class="all-33 small-100 tiny-100">';
-
-        echo '<h6>'.__('Featured Image', 'wcvendors-pro').'</h6>';
-        $post_thumb 	= has_post_thumbnail( $post_id );
-
-        echo '<div class="wcv-featuredimg" data-title="'.__('Select or Upload a Feature Image', 'wcvendors-pro').'" data-button_text="'.__('Set Product Feature Image', 'wcvendors-pro').'">';
-        if ( $post_thumb ) {
-            $image_attributes = wp_get_attachment_image_src( get_post_thumbnail_id( $post_id), array(150,150) );
-            echo '<img src="'.$image_attributes[0].'" width="'.$image_attributes[1].'" height="'.$image_attributes[2].'">';
-        }
-        echo '</div>';
-        echo '<input type="hidden" id="_featured_image_id" name="_featured_image_id" value="'.( $post_thumb ? get_post_thumbnail_id( $post_id) : '' ). '" />';
-
-
-        echo '<a class="wcv-media-uploader-featured-add ' . ( $post_thumb ? 'hidden' : '' ) . '" href="#" >'.__('Set featured image', 'wcvendors-pro').'</a><br />';
-        echo '<a class="wcv-media-uploader-featured-delete ' . ( !$post_thumb ? 'hidden' : '' )  . '" href="#" >'.__('Remove featured image', 'wcvendors-pro').'</a><br />';
-
-        echo '<span class="wcv_featured_image_msg"></span>';
-
-        echo '</div>';
+        $post_thumb = has_post_thumbnail($post_id);
+        echo '<input type="hidden" id="_featured_image_id" name="_featured_image_id" value="'.( $post_thumb ? get_post_thumbnail_id($post_id) : '' ). '" />';
 
         if ( 'yes' !== get_option( 'wcvendors_hide_product_media_gallery' ) ) {
 
-            if ( metadata_exists( 'post', $post_id, '_product_image_gallery' ) ) {
+            if (metadata_exists('post', $post_id, '_product_image_gallery' ) ) {
                 $product_image_gallery = get_post_meta( $post_id, '_product_image_gallery', true );
             } else {
                 // Backwards compat
@@ -824,7 +816,7 @@ function passion_product_media_uploader( $post_id ) {
                     $attachment_ids = array();
                 }
 
-                $attachment_ids = array_diff( $attachment_ids, array( get_post_thumbnail_id() ) );
+                $attachment_ids = array_diff($attachment_ids, array(get_post_thumbnail_id($post_id)));
                 $product_image_gallery = implode( ',', $attachment_ids );
             }
 
@@ -842,39 +834,41 @@ function passion_product_media_uploader( $post_id ) {
                 )
             );
 
-            echo '<div class="all-66 small-100 tiny-100" >';
+            echo '<div class="all-100 small-100 tiny-100" >';
 
-            echo '<h6>'.__('Gallery', 'wcvendors-pro').'</h6>';
+            echo '<h6>'.__('Images du produit', 'pulmtree').'</h6>';
 
-            echo '<div id="product_images_container" data-gallery_max_upload="'. $gallery_options[ 'max_upload' ] .'" data-gallery_max_notice="'.$gallery_options[ 'notice' ].'" data-gallery_max_selected_notice="' . $gallery_options[ 'max_selected_notice' ] . '">';
-            echo '<ul class="product_images inline">';
-
-            if ( sizeof( $attachment_ids ) > 0 ) {
-
-                foreach( $attachment_ids as $attachment_id ) {
-
-                    echo '<li class="wcv-gallery-image" data-attachment_id="' . $attachment_id . '">';
-                    echo wp_get_attachment_image( $attachment_id, array(150,150) );
-                    echo '<ul class="actions">';
-                    echo '<li><a href="#" class="delete" title="delete"><i class="wcv-icon wcv-icon-times"></i></a></li>';
+            echo '<div id="media-uploader" class="dropzone">';
+                echo '<div id="product_images_container" data-gallery_max_upload="'. $gallery_options[ 'max_upload' ] .'" data-gallery_max_notice="'.$gallery_options[ 'notice' ].'" data-gallery_max_selected_notice="' . $gallery_options[ 'max_selected_notice' ] . '">';
+                    echo '<ul class="product_images inline">';
+                    if ( $post_thumb ) {
+                        $attachment_id = get_post_thumbnail_id($post_id);
+                        echo '<li class="wcv-gallery-image" data-attachment_id="' . $attachment_id . '">';
+                        echo wp_get_attachment_image($attachment_id, array(150,150) );
+                        echo '<ul class="actions">';
+                        echo '<li><a href="#" class="po_delete" title="delete"><i class="wcv-icon wcv-icon-times"></i></a></li>';
+                        echo '</ul>';
+                        echo '</li>';
+                    }
+                    if ( sizeof( $attachment_ids ) > 0 ) {
+                        foreach( $attachment_ids as $attachment_id ) {
+                            echo '<li class="wcv-gallery-image" data-attachment_id="' . $attachment_id . '">';
+                            echo wp_get_attachment_image( $attachment_id, array(150,150) );
+                            echo '<ul class="actions">';
+                            echo '<li><a href="#" class="po_delete" title="delete"><i class="wcv-icon wcv-icon-times"></i></a></li>';
+                            echo '</ul>';
+                            echo '</li>';
+                        }
+                    }
                     echo '</ul>';
-                    echo '</li>';
-
-                }
-
-            }
-            echo '</ul>';
-            echo '<input type="hidden" id="product_image_gallery" name="product_image_gallery" value="'. ( ( sizeof( $attachment_ids ) > 0 ) ? $product_image_gallery : '' ). '">';
-            echo '</div>';
-            echo '<p class="wcv-media-uploader-gallery"><a href="#" data-choose="' .__( 'Add Images to Product Gallery', 'wcvendors-pro'). '" data-update="' .__( 'Add to gallery', 'wcvendors-pro'). '" data-delete="Delete image" data-text="Delete">' .__( 'Add product gallery images', 'wcvendors-pro'). '</a></p>';
-
-            echo '<span class="wcv_gallery_msg"></span>';
-
+                    echo '<input type="hidden" id="product_image_gallery" name="product_image_gallery" value="'. (( sizeof( $attachment_ids ) > 0 ) ? $product_image_gallery : '' ). '">';
+                echo '</div>';
+                echo '<span class="wcv_gallery_msg"></span>';
+            echo '</div>'; // dropzone
             echo '</div>';
 
         }
-
-        echo '<div class="all-100"><div id="media-uploader" class="dropzone"></div></div>';
+        
 
         do_action( 'wcv_form_product_media_uploader_after_product_media_uploader', $post_id );
 

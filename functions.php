@@ -944,11 +944,6 @@ function po_handle_deleted_media(){
 }
 
 function po_wp_handle_upload($data, $action){
-    ob_start();
-    print_r($data);
-    echo $action;
-    $c = ob_get_clean();
-    file_put_contents(ABSPATH . 'bbb.log', $c);
     return $data;
 }
 add_filter('wp_handle_upload', 'po_wp_handle_upload', 10, 2);
@@ -973,12 +968,6 @@ function po_wp_check_filetype_and_ext($data, $file, $filename, $mimes, $real_mim
         }
     }
     
-    ob_start();
-    print_r($data);
-    echo $filename;
-    $c = ob_get_clean();
-    file_put_contents(ABSPATH . 'aaa.log', $c);
-    
     return $data;
 }
-add_filter('wp_check_filetype_and_ext', 'po_wp_check_filetype_and_ext', PHP_MAX_INT, 5);
+//add_filter('wp_check_filetype_and_ext', 'po_wp_check_filetype_and_ext', PHP_MAX_INT, 5);

@@ -11,6 +11,10 @@ License URI: http://www.gnu.org/licenses/gpl-2.0.html
 Tags: one-column, two-columns, right-sidebar, custom-header, custom-menu, editor-style, featured-images, microformats, post-formats, sticky-post, translation-ready
 Text Domain: plumtree
 */
+.sold-by-container.bottom-slide {
+    opacity: 0.7 !important;
+    bottom: 0 !important;
+}
 .wcv-grid #product_images_container ul li.wcv-gallery-image {overflow: hidden;}
 .wcv-grid #product_images_container ul li.wcv-gallery-image img{width: 100%; height: auto;}
 .widget_products  img{width: 100%;}
@@ -82,7 +86,7 @@ ul.nav-items li input.button4:hover {
 .logged-in .hide_if_logged_in{ display: none !important;}
 .show_if_logged_in{display: none !important;}
 .logged-in .show_if_logged_in{display: block !important;}
-.single-product .breadcrumbs-wrapper .container .col-md-8{float: right !important;}
+.single-product .breadcrumbs-wrapper .container .col-md-8{float: left !important; text-align: left;}
 .passion_vendor_box{padding: 25px;border-style: solid;border-width: 1px;border-color: #e1e1e1;}
 .passion_vendor_box .passion_vendor-image{margin-right: 10px;vertical-align: top;text-align: center;}
 .passion_vendor_box .passion_vendor-image img{width: 120px;max-height: 120px;overflow: hidden;object-fit: cover;border-radius: 50%;}
@@ -188,11 +192,15 @@ figure.handy-banner .button {width: auto !important; height: auto !important; pa
 .category-recommended.style-2 ul.products li.product{width: 49% !important; margin: 0 !important;}
 .category-recommended ul.products li.product .inner-product-content{position: relative !important;}
 .category-recommended ul.products li.product .inner-product-content .product-img-wrapper{width: 100% !important;max-width: 100% !important;}
-.category-recommended ul.products li.product .inner-product-content .product-description-wrapper{width: 90% !important; position: absolute !important;bottom: 20px !important;left: 10px !important;}
+.category-recommended ul.products li.product .inner-product-content .product-description-wrapper{width: 100% !important; position: absolute !important;bottom: 40px !important;left: 10px !important;opacity: 0.9;background: #ffffff;}
 .category-recommended ul.products li.product .inner-product-content .product-description-wrapper .link-to-product{display: none!important;}
 .category-recommended ul.products li.product .inner-product-content .product-description-wrapper .short-description{display: none!important;}
 .category-recommended ul.products li.product .inner-product-content .product-description-wrapper .star-rating{display: none!important;}
 .category-recommended ul.products li.product .inner-product-content .product-description-wrapper a.button:not(.add_to_cart_button){display: none!important;}
+.category-recommended ul.products li.product .inner-product-content .product-description-wrapper .add_to_cart_button {
+    right: 25px;
+    bottom: 2px;
+}
 
 .woocommerce-form-login.login p.woocommerce-form-row label{ width: 280px;}
 .wcv-dashboard-navigation ul li a.button{padding: 10px;margin-right: 10px;background-color: #b1d1c9;}

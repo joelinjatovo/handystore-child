@@ -522,8 +522,134 @@ add_filter( 'wcv_vendor_store_city', 'passion_wcv_vendor_store_input_hidden', 10
 add_filter( 'wcv_vendor_store_state', 'passion_wcv_vendor_store_input_hidden', 100, 1 );
 add_filter( 'wcv_vendor_store_postcode', 'passion_wcv_vendor_store_input_hidden', 100, 1 );
 
+if(class_exists('Walker') && !class_exists('Passion_Cats_List_Walker') ){
+    class Passion_Cats_List_Walker extends Walker {
+        private $curItem;
+
+        var $tree_type = 'product_cat';
+        var $db_fields = array ( 'parent' => 'parent', 'id' => 'term_id', 'slug' => 'slug' );
+
+        /**
+         * @see Walker::start_lvl()
+         * @since 1.0
+         *
+         */
+        public function start_lvl( &$output, $depth = 0, $args = array() ) {
+            if ( 'list' != $args['style'] )
+                return;
+
+            $indent = str_repeat("\t", $depth);
+            $data = get_object_vars($this->curItem);
+            $parent_id = $data['term_id'];
+            $col_class = '';
+
+            if ($this->collapsing == true) {
+                $col_class = ' collapse';
+                if ( $args['current_category_ancestors'] && $args['current_category'] && in_array( $parent_id, $args['current_category_ancestors'] ) ) {
+                $col_class .= ' in'; }
+            }
+
+            $output .= "$indent<ul id='children-of-{$parent_id}' class='children".esc_attr($col_class)."'>\n";
+        }
+
+        /**
+         * @see Walker::end_lvl()
+         * @since 1.0
+         */
+        public function end_lvl( &$output, $depth = 0, $args = array() ) {
+            if ( 'list' != $args['style'] )
+                return;
+
+            $indent = str_repeat("\t", $depth);
+            $output .= "$indent</ul>\n";
+        }
+
+        /**
+         * @see Walker::start_el()
+         * @since 1.0
+         */
+        public function start_el( &$output, $cat, $depth = 0, $args = array(), $current_object_id = 0 ) {
+            $this->curItem = $cat;
+
+            if ($this->show_img == true) {
+                $thumbnail_id = get_woocommerce_term_meta( $cat->term_id, 'thumbnail_id', true );
+                $image = wp_get_attachment_image( $thumbnail_id, 'pt-cat-thumb', false );
+            }
+
+            /* Adding extra classes if needed */
+            $output .= '<li class="cat-item cat-item-' . esc_attr($cat->term_id);
+            if ( $args['current_category'] == $cat->term_id ) {
+                $output .= ' current-cat';
+            }
+            if ( $args['has_children'] && $args['hierarchical'] ) {
+                $output .= ' cat-parent';
+            }
+            if ( $args['current_category_ancestors'] && $args['current_category'] && in_array( $cat->term_id, $args['current_category_ancestors'] ) ) {
+                $output .= ' current-cat-parent';
+            }
+            $output .=  '">';
+
+            /* Output categorie img */
+            if ($image && $image!='') {
+                $output .= '<span class="cat-img-wrap">'.$image.'</span>';
+            }
+
+            /* Get link to category & Adding extra data to cat anchor */
+            $term_link = get_term_link( (int) $cat->term_id, $cat->taxonomy );
+            if ( !is_wp_error( $term_link ) ) {
+          $output .=  '<a href="' . esc_url($term_link) . '">' . esc_attr($cat->name) . '</a>';
+        }
+
+            /* Adding show subcategories button */
+            if ($this->collapsing == true) {
+                $anchor = '';
+                if ( $args['has_children'] && $args['hierarchical'] ) {
+                    $anchor = '<a href="#children-of-'.esc_attr($cat->term_id).'" class="show-children collapsed" data-toggle="collapse" aria-controls="children-of-'. esc_attr($cat->term_id) .'" aria-expanded="false"></a>';
+                }
+            if ( $args['current_category_ancestors'] && in_array( $cat->term_id, $args['current_category_ancestors'] ) ) {
+                $anchor = '<a href="#children-of-'.esc_attr($cat->term_id).'" class="show-children" data-toggle="collapse" aria-controls="children-of-'. esc_attr($cat->term_id) .'" aria-expanded="true"></a>';
+            }
+                $output .= $anchor;
+            }
+
+            /* Adding counter if needed */
+            if ( $args['show_count'] ) {
+                $output .= ' <span class="count">(' . esc_attr($cat->count) . ')</span>';
+            }
+        }
+
+        /**
+         * @see Walker::end_el()
+         * @since 1.0
+         */
+        public function end_el( &$output, $cat, $depth = 0, $args = array() ) {
+            $output .= "</li>\n";
+        }
+
+        /**
+         * Traverse elemen ts to create list from elements.
+         *
+         * Display one element if the element doesn't have any children otherwise,
+         * display the element and its children. Will only traverse up to the max
+         * depth and no ignore elements under that depth. It is possible to set the
+         * max depth to include all depths, see walk() method.
+         *
+         * This method shouldn't be called directly, use the walk() method instead.
+         *
+         * @since 1.0
+         */
+        public function display_element( $element, &$children_elements, $max_depth, $depth = 0, $args, &$output ) {
+            if ( ! $element || 0 === $element->count ) {
+                //return;
+            }
+            parent::display_element( $element, $children_elements, $max_depth, $depth, $args, $output );
+        }
+    }
+}
+
+
 function passion_categories_box_shortcode($atts) {
-    if(class_exists('PT_Cats_List_Walker')){
+    if(class_exists('Passion_Cats_List_Walker')){
         ob_start();
 
         $defaults = array(
@@ -553,7 +679,7 @@ function passion_categories_box_shortcode($atts) {
             $cat_ancestors = get_ancestors($current_cat->term_id, $cats_type);
         }
 
-        $catsWalker = new \PT_Cats_List_Walker();
+        $catsWalker = new \Passion_Cats_List_Walker();
         $catsWalker->show_img = $show_img;
         $catsWalker->collapsing = $collapsing;
 
@@ -562,7 +688,7 @@ function passion_categories_box_shortcode($atts) {
             'order'              => $order,
             'style'              => 'list',
             'show_count'         => $show_count,
-            'hide_empty'         => true,
+            'hide_empty'         => false,
             'exclude'            => $exclude_cats,
             'hierarchical'       => $hierarchical,
             'title_li'           => '',

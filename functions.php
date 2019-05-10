@@ -33,6 +33,7 @@ function passion_enqueue_scripts() {
     $drop_param = array(
       'upload'              => admin_url( 'admin-ajax.php?action=handle_dropped_media' ),
       'delete'              => admin_url( 'admin-ajax.php?action=handle_deleted_media' ),
+      'jsonError'  => __( 'Reponse invalide.', 'pulmtree'),
       'dictMaxFilesExceeded'  => __( 'Vous ne pouvez plus télécharger de fichiers.', 'pulmtree'),
       'dictDefaultMessage'  => __( 'Add Images to Product Gallery', 'wcvendors-pro'),
       'dictFileTooBig'  => __( 'Cette image est trop grande. Nous n\'autorisons que 2Mo ou moins.', 'pulmtree'),
@@ -970,4 +971,4 @@ function po_wp_check_filetype_and_ext($data, $file, $filename, $mimes, $real_mim
     
     return $data;
 }
-add_filter('wp_check_filetype_and_ext', 'po_wp_check_filetype_and_ext', PHP_MAX_INT, 5);
+add_filter('wp_check_filetype_and_ext', 'po_wp_check_filetype_and_ext', 1000, 5);

@@ -24,40 +24,43 @@ jQuery(document).ready(function($){
         dictUploadCanceled: dropParam.dictUploadCanceled,
         dictCancelUploadConfirmation: dropParam.dictCancelUploadConfirmation,
         success: function (file, response) {
-            console.log(response);
-            
-            var data = JSON.parse(response);
-            
-            if(data.status==1){
-                
-                jQuery('.wcv_gallery_msg').text('');
-                file.previewElement.classList.add("dz-success");
-                file['attachment_id'] = data.attachment_id; // push the id for future reference
+            try{
+                var data = JSON.parse(response);
+                if(data.status==1){
+                    jQuery('.wcv_gallery_msg').text('');
+                    file.previewElement.classList.add("dz-success");
+                    file['attachment_id'] = data.attachment_id; // push the id for future reference
 
-                jQuery('ul.product_images').append('<li class="wcv-gallery-image" data-attachment_id="'+data.attachment_id+'"><img width="150" height="150" src="'+file.dataURL+'" class="attachment-150x150 size-150x150" alt=""><ul class="actions"><li><a href="#" class="po_delete" title="delete"><i class="fa fa-times"></i></a></li></ul></li>');
+                    jQuery('ul.product_images').append('<li class="wcv-gallery-image" data-attachment_id="'+data.attachment_id+'"><img width="150" height="150" src="'+file.dataURL+'" class="attachment-150x150 size-150x150" alt=""><ul class="actions"><li><a href="#" class="po_delete" title="delete"><i class="fa fa-times"></i></a></li></ul></li>');
 
-                var $featured_image_id = jQuery('#_featured_image_id');
-                var $image_gallery_ids = jQuery('#product_image_gallery');
+                    var $featured_image_id = jQuery('#_featured_image_id');
+                    var $image_gallery_ids = jQuery('#product_image_gallery');
 
-                var featured_image_id = '';
-                var attachment_ids = '';
+                    var featured_image_id = '';
+                    var attachment_ids = '';
 
-                jQuery('#product_images_container ul li.wcv-gallery-image').css('cursor','default').each(function() {
-                    var attachment_id = jQuery(this).attr( 'data-attachment_id' );
-                    if(featured_image_id===''){
-                        featured_image_id = attachment_id;
-                    }else{
-                        attachment_ids = attachment_ids + attachment_id + ',';
-                    }
-                });
+                    jQuery('#product_images_container ul li.wcv-gallery-image').css('cursor','default').each(function() {
+                        var attachment_id = jQuery(this).attr( 'data-attachment_id' );
+                        if(featured_image_id===''){
+                            featured_image_id = attachment_id;
+                        }else{
+                            attachment_ids = attachment_ids + attachment_id + ',';
+                        }
+                    });
 
-                $featured_image_id.val( featured_image_id );
-                $image_gallery_ids.val( attachment_ids );
-            }else{
+                    $featured_image_id.val( featured_image_id );
+                    $image_gallery_ids.val( attachment_ids );
+                }else{
+                    file.previewElement.classList.add("dz-error");
+                    jQuery('.wcv_gallery_msg').text(data.message);
+                    poDropzone.options.maxFiles = poDropzone.options.maxFiles + 1;
+                }
+            }catch(e){
                 file.previewElement.classList.add("dz-error");
-                jQuery('.wcv_gallery_msg').text(data.message);
+                jQuery('.wcv_gallery_msg').text(dropParam.jsonError);
                 poDropzone.options.maxFiles = poDropzone.options.maxFiles + 1;
             }
+            
         },
         error: function (file, response) {
             file.previewElement.classList.add("dz-error");
